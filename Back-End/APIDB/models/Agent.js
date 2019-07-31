@@ -48,9 +48,7 @@ module.exports = (sequelize, type) => {
           type: type.STRING(255),
           field: 'client_email',
           allowNull: false
-        },
-          
-      
-      })
+        }
+    })
 
 }
