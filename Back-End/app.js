@@ -42,7 +42,7 @@ var corsOptionsDelegate = function (req, callback) {
 }
 
 router.options('*', cors(corsOptionsDelegate))
-router.post('/login',authentication.decrypt, authentication.auth);
+router.post('/login', authentication.auth);
 router.post('/createIntent',authentication.verifyToken, credentials.userData, intentCreate.createIntent); //Write like this one to add functionalities
 router.delete('/deleteIntent',  authentication.verifyToken, credentials.userData, intentDelete.deleteIntent);
 router.post('/createEntityType',  authentication.verifyToken, credentials.userData, entityTypeCreate.createEntityType);
@@ -64,10 +64,13 @@ router.get('/protected', passport.authenticate('jwt', { session: false }), funct
   res.json('Success! You can now see this without a token.');
 });
 
-router.post('/api/agentCreate', authentication.encrypt, (req, res) => {
+router.post('/api/agentCreate', (req, res, next) => {
   Agent.create(req.body)
-    .then(result => res.json(result));
+ .then(result => res.json(result));
 })
+
+
+
 router.post('/api/create', (req, res) => {
   Admin.create(req.body)
     .then(result => res.json(result));

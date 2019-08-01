@@ -7,6 +7,8 @@ const ContextModel = require('./models/Context')
 const KnowledgeBaseModel = require('./models/KnowledgeBase')
 const DocumentModel = require('./models/Document')
 const AdminModel = require('./models/admins');
+const crypto = require('crypto');
+const authentication = require('../routes/auth')
 
 
 
@@ -30,8 +32,41 @@ const Context = ContextModel(sequelize, Sequelize)
 const KnowledgeBase = KnowledgeBaseModel(sequelize, Sequelize)
 const Document = DocumentModel(sequelize, Sequelize)
 const Admin = AdminModel(sequelize,Sequelize);
+Agent.beforeCreate((Agent, options) => {
 
-Admin.hasMany(Agent)
+  return authentication.encrpt(req.body.password, 10)
+      .then(hash => {
+          Agent.password = hash;
+      })
+      .catch(err => { 
+          throw new Error(); 
+      });
+});
+// Agent.generateSalt = function() {
+//   return crypto.randomBytes(16).toString('base64')
+// }
+// User.encryptPassword = function(plainText, salt) {
+//   return crypto
+//       .createHash('RSA-SHA256')
+//       .update(plainText)
+//       .update(salt)
+//       .digest('hex')
+// }
+
+// const setSaltAndPassword = Agent => {
+//   if (Agent.changed('password')) {
+//       Agent.salt = Agent.generateSalt()
+//       Agent.password = Agent.encryptPassword(Agent.password(), Agent.salt())
+//   }
+// }
+
+
+// Agent.beforeCreate(setSaltAndPassword)
+// Agent.beforeUpdate(setSaltAndPassword)
+
+// Agent.prototype.correctPassword = function(enteredPassword) {
+//   return Agent.encryptPassword(enteredPassword, this.salt()) === this.password()
+// }
 
 
 Agent.hasMany(Intent, {
@@ -40,40 +75,6 @@ Agent.hasMany(Intent, {
       allowNull: false
     }
   })
-//   Agent.beforeCreate((Agent, options) => {
-
-//     return bcrypt.hash(Agent.password, 10)
-//         .then(hash => {
-//             Agent.password = hash;
-//         })
-//         .catch(err => { 
-//             throw new Error(); 
-//         });
-// });
-
-// Agent.beforeCreate((Agent, options) => {
-
-//   return bcrypt.hash(Agent.private_key, 10)
-//       .then(hash => {
-//           Agent.private_key= hash;
-//       })
-//       .catch(err => { 
-//           throw new Error(); 
-//       });
-// });
-
-// Agent.beforeCreate((Agent, options) => {
-
-//   return bcrypt.hash(Agent.client_email, 10)
-//       .then(hash => {
-//           Agent.client_email = hash;
-//       })
-//       .catch(err => { 
-//           throw new Error(); 
-//       });
-// });
-
-
 
   Agent.hasMany(Entity, {
     foreignKey: {
